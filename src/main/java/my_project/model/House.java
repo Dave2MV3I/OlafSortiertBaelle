@@ -25,7 +25,7 @@ public class House extends GraphicalObject {
     public void draw(DrawTool drawTool) {
         drawTool.setCurrentColor(Color.DARK_GRAY);
         drawTool.drawFilledRectangle(150,300,100,80);
-    }
+    } // hi
 
     /**
      * Wird mit jedem Frame vom Framework aufgerufen und dient zur Manipulation des Objekts im Verlauf
