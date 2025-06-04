@@ -11,7 +11,7 @@ public class BallRow extends GraphicalObject{
         private Ball[] balls;
 
     // Methoden
-    public BallRow(int nBalls) {
+    public BallRow(int nBalls ) {
         this.nBalls = nBalls;
         balls = new Ball[nBalls];
         double randomY = 100 + Math.random() * (Config.WINDOW_HEIGHT-200);

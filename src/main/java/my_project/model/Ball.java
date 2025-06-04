@@ -15,7 +15,7 @@ public class Ball extends GraphicalObject {
         private int[] color = {255,255,255};
 
     // Methoden
-    public Ball(double x, double y, int value){
+    public Ball(double x, double y, int value ){
         this.x = x;
         this.y = y;
         this.value = value;
