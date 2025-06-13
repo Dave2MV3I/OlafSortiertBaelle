@@ -21,6 +21,7 @@ public class ProgramController {
     public void startProgram() {
         BallRow ballRow = new BallRow(10);
         viewController.draw(ballRow);
+        viewController.register(ballRow);
     }
 
     public void updateProgram(double dt){

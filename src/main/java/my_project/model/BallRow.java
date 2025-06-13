@@ -1,14 +1,18 @@
 package my_project.model;
 
 import KAGO_framework.model.GraphicalObject;
+import KAGO_framework.model.InteractiveGraphicalObject;
 import KAGO_framework.view.DrawTool;
 import my_project.Config;
 
-public class BallRow extends GraphicalObject{
+import java.awt.event.KeyEvent;
+
+public class BallRow extends InteractiveGraphicalObject {
 
     // Attribute
         private int nBalls;
         private Ball[] balls;
+        private int tries;
 
     // Methoden
     public BallRow(int nBalls ) {
@@ -29,14 +33,30 @@ public class BallRow extends GraphicalObject{
         }
     }
 
-    public void search(int value){
+    @Override
+    public void keyPressed(int key){
+        if (key == KeyEvent.VK_S) {
+            int randomValue = (int)(1+Math.random()*98);
+            System.out.println(randomValue);
+            if(search(randomValue)){
+                System.out.println("Tries till found " + randomValue + " : " + tries);
+            }
+        }
+    }
+
+    public boolean search(int value){
         boolean found = false;
         for (Ball b : balls){
-            if (!found && b.getValue() == value){
-                found = true;
-                b.changeColor(173,216,230);
-            } else b.changeColor(255,255,255);
+            if (b != null){
+                if (!found && b.getValue() == value){
+                    found = true;
+                    b.changeColor(173,216,230);
+                } else b.changeColor(255, 255, 255);
+            }
         }
+
+        tries++;
+        return found;
     }
 
 }
