@@ -12,7 +12,6 @@ public class BallRow extends InteractiveGraphicalObject {
     // Attribute
         private int nBalls;
         private Ball[] balls;
-        private int tries;
 
     // Methoden
     public BallRow(int nBalls ) {
@@ -38,25 +37,41 @@ public class BallRow extends InteractiveGraphicalObject {
         if (key == KeyEvent.VK_S) {
             int randomValue = (int)(1+Math.random()*98);
             System.out.println(randomValue);
-            if(search(randomValue)){
-                System.out.println("Tries till found " + randomValue + " : " + tries);
-            }
+            System.out.println("Comparisons: " + search(randomValue));
         }
     }
 
-    public boolean search(int value){
-        boolean found = false;
+    public int search(int value){
         for (Ball b : balls){
             if (b != null){
-                if (!found && b.getValue() == value){
-                    found = true;
-                    b.changeColor(173,216,230);
-                } else b.changeColor(255, 255, 255);
+                b.changeColor(255, 255, 255);
             }
         }
 
-        tries++;
-        return found;
+        int comparisons = 0;
+        for (Ball b : balls){
+            comparisons+=3;
+            if (b != null){
+                if (b.getValue() == value){
+                    b.changeColor(173,216,230);
+                    return comparisons;
+                }
+            }
+        }
+        return comparisons;
+    }
+
+    public Ball[] sort(Ball[] balls){
+        // Unterschied zw. größter und kleinster Zahl finden
+        // Wdh: Array durchgehen bis eine Zahl kommt, die größer als die Hälfte des Unterschiedes ist. Cutten.
+        // Auf diese Weise viele Arrayschnipsel schaffen mit Zahlen, die in einer der beiden Hälften sind.
+        // Schnipsel auf eine effiziente Weise sortieren
+        // Zusammenführen
+
+        return balls;
     }
 
 }
+
+//TODO 1 public void sort
+//TODO 2 Durchschnitt der Vergleichsanzahl ermitteln
