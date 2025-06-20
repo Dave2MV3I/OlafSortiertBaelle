@@ -42,6 +42,11 @@ public class BallRow extends InteractiveGraphicalObject {
         if (key == KeyEvent.VK_D) {
             balls = sort(balls);
         }
+
+        // Positionen anpassen, damit man die Sortierung sieht
+        for (int i = 0; i < balls.length; i++) {
+            balls[i].setX(50 + 25 * i);  // Neue Position basierend auf Index
+        }
     }
 
     public int search(int value){
@@ -85,7 +90,7 @@ public class BallRow extends InteractiveGraphicalObject {
 
             // 2. Solange ein (alter) Subarray mehr als 2 Stellen hat, wird er geteilt
                 int divisionsNeeded = getDivisionsNeeded(array);
-                while (divisionsNeeded > 0){
+                /*while (divisionsNeeded > 0){
                     Ball[][] extendedArray = new Ball[array.length+divisionsNeeded][];
                     int index = 0;
                     // Bälle aus dem alten Array (array) in den weiter aufgeteilten Array (extendedArray) verschieben
@@ -100,7 +105,43 @@ public class BallRow extends InteractiveGraphicalObject {
                     }
                     // Alter array wird ersetzt durch genauer aufgeteilten extendedArray
                     array = extendedArray;
+                }*/
+
+                while (true){
+                    // Schritt 1: Schätze maximale Größe (Worst Case: jeder Subarray wird zu 2)
+                    Ball[][] extendedArray = new Ball[array.length * 2][];
+                    int index = 0;
+                    boolean didDivide = false;
+
+                    for (Ball[] oldSubarray : array){
+                        if (oldSubarray.length <= 2){
+                            extendedArray[index++] = oldSubarray;
+                        } else {
+                            Ball[][] newSubarray = divideArray(oldSubarray);
+
+                            // Sicherheitsprüfung
+                            if (newSubarray[1].length == 0) {
+                                // Keine sinnvolle Teilung → als Ganzes übernehmen
+                                extendedArray[index++] = newSubarray[0];
+                            } else {
+                                // Zwei echte Subarrays → beide übernehmen
+                                extendedArray[index++] = newSubarray[0];
+                                extendedArray[index++] = newSubarray[1];
+                                didDivide = true;
+                            }
+                        }
+                    }
+
+                // Nur weiter, wenn überhaupt noch geteilt wurde
+                if (!didDivide) break;
+
+                // Aktives Array aktualisieren
+                array = new Ball[index][];
+                for (int i = 0; i < index; i++) {
+                    array[i] = extendedArray[i];
                 }
+            }
+
 
             // Sobald die Länge aller Subarrays <=2 ist, sie sortieren, zusammenführen und sortieren Array zurückgeben
             return sortAndMergeSubarrays(array, unsortedBalls.length);
@@ -125,7 +166,7 @@ public class BallRow extends InteractiveGraphicalObject {
         return sum/array.length;
     }
 
-    public Ball[][] divideArray(Ball[] array){
+    /*public Ball[][] divideArray(Ball[] array){
         Ball[][] array2D = new Ball[2][];
 
         double average = getAverage(array);
@@ -157,7 +198,41 @@ public class BallRow extends InteractiveGraphicalObject {
         }
 
         return array2D;
+    }*/
+
+    public Ball[][] divideArray(Ball[] array){
+        Ball[][] result = new Ball[2][];
+
+        double average = getAverage(array);
+        int lessThan = 0;
+        int greaterThan = 0;
+
+        for (Ball b : array){
+            if (b.getValue() <= average) lessThan++;
+            else if (b.getValue() > average) greaterThan++;
+        }
+
+        // ❗ Sicherheitsprüfung
+        if (lessThan == 0 || greaterThan == 0){
+            // Rückgabe eines einzelnen Subarrays – keine echte Teilung möglich
+            result[0] = array;
+            result[1] = new Ball[0];  // leer
+            return result;
+        }
+
+        result[0] = new Ball[lessThan];
+        result[1] = new Ball[greaterThan];
+        int index1 = 0;
+        int index2 = 0;
+
+        for (Ball b : array){
+            if (b.getValue() <= average) result[0][index1++] = b;
+            else if (b.getValue() > average) result[1][index2++] = b;
+        }
+
+        return result;
     }
+
 
     public Ball[] sortAndMergeSubarrays(Ball[][] array, int nBalls){    // Only called in the end
         for (int i = 0; i < array.length; i++){             // Für jede Stelle im Array
