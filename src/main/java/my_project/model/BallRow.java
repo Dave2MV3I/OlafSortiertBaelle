@@ -40,7 +40,7 @@ public class BallRow extends InteractiveGraphicalObject {
             System.out.println("Comparisons: " + search(randomValue));
         }
         if (key == KeyEvent.VK_D) {
-            //balls = sort(balls);
+            balls = sort(balls);
         }
     }
 
@@ -77,32 +77,33 @@ public class BallRow extends InteractiveGraphicalObject {
         if (unsortedBalls.length > 1){
             // Davon ausgehend, dass keine Stelle im Array null ist
 
-            // 1. Ursprüngliches Array in ein 2D-Array mit einem Subarray umwandeln
-                Ball[][] newArray = new Ball[1][unsortedBalls.length];
+            // 1. Bälle des ursprünglichen Arrays in ein Subarray eines 2D-Arrays verschieben
+                Ball[][] array = new Ball[1][unsortedBalls.length];
                 for (int i = 0; i < unsortedBalls.length; i++){
-                    newArray[0][i] = unsortedBalls[i];
+                    array[0][i] = unsortedBalls[i];
                 }
 
-            // Solange auch nur einer der Subarrays mehr als 2 Stellen hat, wird er geteilt
-                int divisionsNeeded = getDivisionsNeeded(newArray);
+            // 2. Solange ein (alter) Subarray mehr als 2 Stellen hat, wird er geteilt
+                int divisionsNeeded = getDivisionsNeeded(array);
                 while (divisionsNeeded > 0){
-                    Ball[][] tempNewArray = new Ball[newArray.length+divisionsNeeded][];
+                    Ball[][] extendedArray = new Ball[array.length+divisionsNeeded][];
                     int index = 0;
-                    for (Ball[] subarray : newArray){
-                        if (subarray.length <= 2){
-                            tempNewArray[index++] = subarray;
-                        } else {
-                            Ball[][] dividedArray = divideArray(subarray);
-                            tempNewArray[index++] = dividedArray[0];
-                            tempNewArray[index++] = dividedArray[1];
+                    // Bälle aus dem alten Array (array) in den weiter aufgeteilten Array (extendedArray) verschieben
+                    for (Ball[] oldSubarray : array){
+                        if (oldSubarray.length <= 2){
+                            extendedArray[index++] = oldSubarray;
+                        } else { // Subarray braucht weitere Teilung
+                            Ball[][] newSubarray = divideArray(oldSubarray);
+                            extendedArray[index++] = newSubarray[0];
+                            extendedArray[index++] = newSubarray[1];
                         }
                     }
-                    newArray = tempNewArray;
+                    // Alter array wird ersetzt durch genauer aufgeteilten extendedArray
+                    array = extendedArray;
                 }
 
-            // Sobald die Länge aller Subarrays <=2 ist zusammenführen
-
-
+            // Sobald die Länge aller Subarrays <=2 ist, sie sortieren, zusammenführen und sortieren Array zurückgeben
+            return sortAndMergeSubarrays(array, unsortedBalls.length);
         }
 
         return unsortedBalls; // Wenn nur 1 Ball im array
@@ -158,16 +159,29 @@ public class BallRow extends InteractiveGraphicalObject {
         return array2D;
     }
 
-    public Ball[][] sortAndMergeSubarrays(Ball[][] array){ // Only called in the end
-        return null;
+    public Ball[] sortAndMergeSubarrays(Ball[][] array, int nBalls){    // Only called in the end
+        for (int i = 0; i < array.length; i++){             // Für jede Stelle im Array
+            for (int j = 0; j < array[i].length-1; j++){      // Für jeden Subarray einer Stelle außer der letzen
+                // Vergleich zweier aufeinanderfolgender Bälle
+                if (array[i][j].getValue() > array[i][j+1].getValue()){
+                    // Tausch zweier Bälle
+                    Ball temp = array[i][j];
+                    array[i][j] = array[i][j+1];
+                    array[i][j+1] = temp;
+                }
+            }
+        }
+
+        Ball[] sortedArray = new Ball[nBalls];
+        int index = 0;
+        for (Ball[] subarray : array){
+            for (Ball b : subarray){
+                sortedArray[index++] = b;
+            }
+        }
+
+        return sortedArray;
     }
-
-    public Ball[] mergeSubarrays(Ball[][] array){ // Only called in the end by sortAndMergeSubarrays
-        return null;
-    }
-
-
-
 }
 
 //TODO 1 public void sort
