@@ -64,270 +64,109 @@ public class BallRow extends InteractiveGraphicalObject {
         return comparisons;
     }
 
-    /*public Ball[] sort(Ball[] balls){
-        // Unterschied zw. größter und kleinster Zahl finden
-            Ball smallest = null;
-            Ball biggest = null;
-            smallest = balls[0];
-            biggest = balls[0];
-            for (Ball b : balls){
-                if (b != null && b.getValue() < smallest.getValue()){
-                    smallest = b;
-                } else if (b != null && b.getValue() > biggest.getValue()){
-                    biggest = b;
-                }
-            }
-            System.out.println("Smallest: " + smallest.getValue());
-            System.out.println("Biggest: " + biggest.getValue());
+    /** ---------------------------------------------------------------------- <br>
+     * IDEE: <br> <br>
+     * 2D Array mit so vielen Subarray, dass jeder Subarray.length <= 2 || <br>
+     * Wenn ein subarray.length > 2 ihn teilen || <br>
+     * Für jeden Aufruf von divide(...) wird ein neuer Array mit mehr 1D-Plätzen und weniger 2D-Plätzen pro 1D-Platz erstellt || <br>
+     * Aufteilung nach < oder > double average, also klein -> groß von links nach rechts || <br>
+     * new Array [Summe aller subarray.length] und Zusammenführen der Subarrays || <br>
+     ---------------------------------------------------------------------- */
 
-        // Wdh: Array durchgehen bis eine Zahl kommt, die größer als die Hälfte des Unterschiedes ist. Cutten.
-            int half = (biggest.getValue() - smallest.getValue()) / 2;
-            //Ball cutBeforeThisOne = null;
-            boolean lessThanHalf = true;
-            int cuts = 0;
-            for (Ball b : balls){
-                if (b != null){
-                    if (b.getValue() < half) {
-                        lessThanHalf = true;
-                    } else {
-                        cuts++;
-                        lessThanHalf = false;
+    public Ball[] sort(Ball[] unsortedBalls){
+        if (unsortedBalls.length > 1){
+            // Davon ausgehend, dass keine Stelle im Array null ist
+
+            // 1. Ursprüngliches Array in ein 2D-Array mit einem Subarray umwandeln
+                Ball[][] newArray = new Ball[1][unsortedBalls.length];
+                for (int i = 0; i < unsortedBalls.length; i++){
+                    newArray[0][i] = unsortedBalls[i];
+                }
+
+            // Solange auch nur einer der Subarrays mehr als 2 Stellen hat, wird er geteilt
+                int divisionsNeeded = getDivisionsNeeded(newArray);
+                while (divisionsNeeded > 0){
+                    Ball[][] tempNewArray = new Ball[newArray.length+divisionsNeeded][];
+                    int index = 0;
+                    for (Ball[] subarray : newArray){
+                        if (subarray.length <= 2){
+                            tempNewArray[index++] = subarray;
+                        } else {
+                            Ball[][] dividedArray = divideArray(subarray);
+                            tempNewArray[index++] = dividedArray[0];
+                            tempNewArray[index++] = dividedArray[1];
+                        }
                     }
+                    newArray = tempNewArray;
                 }
 
-                 && b.getValue() > half){
-                    //cutBeforeThisOne = b;
+            // Sobald die Länge aller Subarrays <=2 ist zusammenführen
 
-                }
-            }
 
-        // Auf diese Weise viele Arrayschnipsel schaffen mit Zahlen, die in einer der beiden Hälften sind.
-            Ball
+        }
 
-        // Schnipsel auf eine effiziente Weise sortieren
-        // Zusammenführen
-
-        return balls;
-    }*/
-
-    /*public Ball[] sort(Ball[] balls){
-        // Find Pivot
-            int randomBall = (int)(Math.random()*nBalls);
-            Ball pivot = balls[randomBall];
-            int pivotValue = pivot.getValue();
-
-        // Division into 2 groups
-            Ball[] group1 = new Ball[balls.length/2];
-            int group1Index = 0;
-            Ball[] group2 = new Ball[balls.length/2];
-            int group2Index = 0;
-
-            for (Ball b : balls){
-                if (b.getValue() < pivotValue) {
-                    group1[group1Index] = b;
-                    group1Index++;
-                } else{
-                    group2[group2Index] = b;
-                    group2Index++;
-                }
-            }
-
-        // Division of first array into 2 groups
-            Ball pivot1 = group1[(int)(Math.random()*group1.length)];
-            int pivotValue1 = pivot1.getValue();
-
-            Ball[] group11 = new Ball[group1.length/2];
-            int group11Index = 0;
-            Ball[] group12 = new Ball[group1.length/2];
-            int group12Index = 0;
-
-            for (Ball b : group1){
-                if (b.getValue() < pivotValue1) {
-                    group11[group11Index] = b;
-                    group11Index++;
-                } else{
-                    group12[group12Index] = b;
-                    group12Index++;
-                }
-            }
-
-        // Division of second array into 2 groups
-            Ball pivot2 = group2[(int)(Math.random()*group2.length)];
-            int pivotValue2 = pivot2.getValue();
-
-            Ball[] group21 = new Ball[group2.length/2];
-            int group21Index = 0;
-            Ball[] group22 = new Ball[group2.length/2];
-            int group22Index = 0;
-
-            for (Ball b : group2){
-                if (b.getValue() < pivotValue2) {
-                    group21[group21Index] = b;
-                    group21Index++;
-                } else{
-                    group22[group22Index] = b;
-                    group22Index++;
-                }
-            }
-
-        // Sort 1.1
-            for (int i = 0; i < group11.length; i++){
-                for (int j = 1; j < group11.length; j++){
-                    Ball first = null;
-                    if (group11[i].getValue() > group11[j].getValue()){
-                        first = group11[i];
-                        group11[i] = group11[j];
-                        group11[j] = first;
-                    }
-                }
-            }
-
-        // Sort 1.2
-            for (int i = 0; i < group12.length; i++){
-                for (int j = 1; j < group12.length; j++){
-                    Ball first = null;
-                    if (group12[i].getValue() > group12[j].getValue()){
-                        first = group12[i];
-                        group12[i] = group12[j];
-                        group12[j] = first;
-                    }
-                }
-            }
-
-        // Sort 2.1
-            for (int i = 0; i < group21.length; i++){
-                for (int j = 1; j < group21.length; j++){
-                    Ball first = null;
-                    if (group21[i].getValue() > group21[j].getValue()){
-                        first = group21[i];
-                        group21[i] = group21[j];
-                        group21[j] = first;
-                    }
-                }
-            }
-
-        // Sort 2.1
-            for (int i = 0; i < group22.length; i++){
-                for (int j = 1; j < group22.length; j++){
-                    Ball first = null;
-                    if (group22[i].getValue() > group22[j].getValue()){
-                        first = group22[i];
-                        group22[i] = group22[j];
-                        group22[j] = first;
-                    }
-                }
-            }
-
-        // Combine 1.1 and 1.2 and sort
-            for (int i = 0; i < group11.length; i++){
-                group1[i] = group11[i];
-            }
-            for (int i = 0; i < group1.length; i++){
-                group1[i+group1.length-1] = group12[i];
-            }
-
-            for (int i = 0; i < group1.length; i++){
-                for (int j = 1; j < group1.length; j++){
-                    Ball first = null;
-                    if (group1[i].getValue() > group1[j].getValue()){
-                        first = group1[i];
-                        group1[i] = group1[j];
-                        group1[j] = first;
-                    }
-                }
-            }
-
-        // Combine 2.1 and 2.2 and sort
-            for (int i = 0; i < group21.length; i++){
-                group2[i] = group21[i];
-            }
-            for (int i = 0; i < group2.length; i++){
-                group2[i+group2.length-1] = group22[i];
-            }
-
-            for (int i = 0; i < group2.length; i++){
-                for (int j = 1; j < group2.length; j++){
-                    Ball first = null;
-                    if (group2[i].getValue() > group2[j].getValue()){
-                        first = group2[i];
-                        group2[i] = group2[j];
-                        group2[j] = first;
-                    }
-                }
-            }
-
-        // Combine 1 and 2 and sort
-            for (int i = 0; i < group1.length; i++){
-                balls[i] = group1[i];
-            }
-            for (int i = 0; i < balls.length; i++){
-                balls[i+group1.length-1] = group2[i];
-            }
-
-            for (int i = 0; i < balls.length; i++){
-                for (int j = 1; j < balls.length; j++){
-                    Ball first = null;
-                    if (balls[i].getValue() > balls[j].getValue()){
-                        first = balls[i];
-                        balls[i] = balls[j];
-                        balls[j] = first;
-                    }
-                }
-            }
-
-        return balls;
-
-        // Methode zum dividen machen mit Rückgabe eines Doppelarrays, je nach nBalls oft dividen
-        // Methode zum untergeordneten Sortieren machen und z.B. group11 übergeben
-    }*/
-
-    public Ball[] sort(Ball[] balls){
-        if (balls.length % 2 == 0){ // Wenn balls.length gerade
-
-            // Abhängig von balls.lenth viele divisions machen mit divideArray()
-            // Divisions sortieren mit sortSubArray()
-            // Divisions zusammenführen mit combineSubArrays()
-
-        } else {return balls;}
-
-        return balls;
+        return unsortedBalls; // Wenn nur 1 Ball im array
     }
 
-    public Ball[][] divideArray(Ball[] balls){
-        Ball[][] doubleArray = new Ball[2][balls.length/2];
-        int index = 0;
-        for (int i = 0; i < balls.length/2; i++){
-            doubleArray[0][i] = balls[index];
-            index++;
+    public int getDivisionsNeeded(Ball[][] array){
+        int divisions = 0;
+        for (Ball[] subarray : array){
+            if (subarray.length > 2) divisions++;
         }
-        for (int i = 0; i < balls.length/2; i++){
-            doubleArray[1][i] = balls[index];
-            index++;
-        }
-        return doubleArray;
+        return divisions;
     }
 
-    public Ball[] sortSubArray(Ball[] balls){
-        // Bekommt einen Unterarray
-        for (int i = 0; i < balls.length-1; i++){
-            for (int j = i+1; j < balls.length; j++){
-                if (balls[i].getValue() > balls[j].getValue()){
-                    Ball first = balls[i];
-                    balls[i] = balls[j];
-                    balls[j] = first;
-                }
+    public double getAverage(Ball[] array){
+        int sum = 0;
+        for (Ball b : array){
+            sum += b.getValue();
+        }
+        return sum/array.length;
+    }
+
+    public Ball[][] divideArray(Ball[] array){
+        Ball[][] array2D = new Ball[2][];
+
+        double average = getAverage(array);
+
+        int lessThanAverage = 0;
+        int moreThanAverage = 0;
+
+        for (Ball b : array){
+            if (b.getValue() < average){
+                lessThanAverage++;
+            } else if (b.getValue() > average){
+                moreThanAverage++;
             }
         }
-        return balls;
+
+        array2D[0] = new Ball[lessThanAverage];
+        int index1 = 0;
+        array2D[1] = new Ball[moreThanAverage];
+        int index2 = 0;
+
+        for (Ball b : array){
+            if (b.getValue() < average){
+                array2D[0][index1] = b;
+                index1++;
+            } else if (b.getValue() > average){
+                array2D[1][index2] = b;
+                index2++;
+            }
+        }
+
+        return array2D;
     }
 
-    public Ball[] combineSubArrays(Ball[][] balls){
-        Ball[] newBalls = null;
-
-
-
-        return newBalls;
+    public Ball[][] sortAndMergeSubarrays(Ball[][] array){ // Only called in the end
+        return null;
     }
+
+    public Ball[] mergeSubarrays(Ball[][] array){ // Only called in the end by sortAndMergeSubarrays
+        return null;
+    }
+
+
 
 }
 
